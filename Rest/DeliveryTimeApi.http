@@ -1,0 +1,27 @@
+@currentDate = {{$datetime iso8601}}
+@horizon = 7
+
+GET http://localhost:61500/deliverytimes?currentdate={{currentDate}}&horizon={{horizon}} HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+###
+@start = "2020-04-16T00:00:00Z"
+@finish = "2020-04-22T23:59:59Z"
+
+POST http://localhost:61500/deliverytimes HTTP/1.1
+content-type: application/json
+
+
+{
+    "name": "sample",
+    "description": "description",
+    "price": 123,
+    "type": "Regular",
+    "daysOfWeek": "Sunday,Monday,Thursday,Sunday",
+    "from": "18:00",
+    "to": "20:00",
+    "start": {{start}},
+    "finish": {{finish}},
+    "closesAt": "16:00"
+}

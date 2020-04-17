@@ -6,16 +6,16 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
 WORKDIR /src
-COPY ["OrderManagementApi/OrderManagementApi.csproj", "OrderManagementApi/"]
-RUN dotnet restore "OrderManagementApi/OrderManagementApi.csproj"
+COPY ["DeliveryTimeApi/DeliveryTimeApi.csproj", "DeliveryTimeApi/"]
+RUN dotnet restore "DeliveryTimeApi/DeliveryTimeApi.csproj"
 COPY . .
-WORKDIR "/src/OrderManagementApi"
-RUN dotnet build "OrderManagementApi.csproj" -c Release -o /app/build
+WORKDIR "/src/DeliveryTimeApi"
+RUN dotnet build "DeliveryTimeApi.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "OrderManagementApi.csproj" -c Release -o /app/publish
+RUN dotnet publish "DeliveryTimeApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "OrderManagementApi.dll"]
+ENTRYPOINT ["dotnet", "DeliveryTimeApi.dll"]
