@@ -12,8 +12,8 @@ namespace DeliveryTimeApi.Models
         private const string DaysOfWeekExpression = @"^[(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday),]+$";
         private const string ZeroOrPositiveExpression = @"^(0|[1-9][0-9]{0,9})$";
 
-        private IEnumerable<DayOfWeek> _availableAtDays = default!;
-        private string _daysOfWeek = default!;
+        private IEnumerable<DayOfWeek> _availableAtDays;
+        private string _daysOfWeek;
 
         [Required]
         [MinLength(1)]
