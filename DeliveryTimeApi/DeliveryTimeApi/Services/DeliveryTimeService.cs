@@ -31,7 +31,7 @@ namespace DeliveryTimeApi.Services
             {
                 var nextDate = currentDate.AddDays(i);
                 var validDeliveryTimes = deliveryTimes
-                    .Where(d => d.ExistAt(nextDate))
+                    .Where(d => d.ExistAt(currentDate, nextDate))
                     .Select(x => new DeliveryTimeDto
                     {
                         Name = x.Name,
@@ -40,7 +40,7 @@ namespace DeliveryTimeApi.Services
                         Finish = x.CalculateFinish(nextDate),
                         Type = x.Type,
                         Price = x.Price,
-                        Available = x.IsAvailable(nextDate)
+                        Available = x.IsAvailable(currentDate, nextDate)
                     });
 
                 result.AddRange(validDeliveryTimes);

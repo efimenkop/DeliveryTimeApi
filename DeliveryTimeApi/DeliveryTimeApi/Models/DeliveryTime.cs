@@ -12,8 +12,8 @@ namespace DeliveryTimeApi.Models
         private const string DaysOfWeekExpression = @"^[(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday),]+$";
         private const string ZeroOrPositiveExpression = @"^(0|[1-9][0-9]{0,9})$";
 
-        private IEnumerable<DayOfWeek> _availableAtDays;
-        private string _daysOfWeek;
+        private IEnumerable<DayOfWeek> _availableAtDays = default!;
+        private string _daysOfWeek = default!;
 
         [Required]
         [MinLength(1)]
@@ -50,7 +50,6 @@ namespace DeliveryTimeApi.Models
         [RegularExpression(ZeroOrPositiveExpression)]
         public decimal Price { get; set; }
 
-        [Required]
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public DeliveryType Type { get; set; }
 
@@ -61,11 +60,11 @@ namespace DeliveryTimeApi.Models
         public string To { get; set; } = default!;
 
         [RegularExpression(TimeOfDayExpression)]
-        public string? ClosesAt { get; set; }
+        public int ClosesBeforeMinutes { get; set; }
 
-        public bool ExistAt(DateTime dateTime)
+        public bool ExistAt(DateTime currentDate, DateTime nextDate)
         {
-            var isValid = dateTime >= Start && dateTime <= Finish;
+            var isValid = nextDate >= Start && nextDate <= Finish;
 
             if (!isValid)
             {
@@ -77,7 +76,12 @@ namespace DeliveryTimeApi.Models
                 return false;
             }
 
-            var isAvailableAt = _availableAtDays.Contains(dateTime.DayOfWeek);
+            if (Type == DeliveryType.Urgent && currentDate.Date != nextDate.Date)
+            {
+                return false;
+            }
+
+            var isAvailableAt = _availableAtDays.Contains(nextDate.DayOfWeek);
 
             return isAvailableAt;
         }
@@ -92,25 +96,23 @@ namespace DeliveryTimeApi.Models
             return dateTime.Date.AddMinutes(GetElapsedMinutes(To));
         }
 
-        public bool IsAvailable(DateTime dateTime)
+        public bool IsAvailable(DateTime currentDate, DateTime nextDate)
         {
-            if (!ExistAt(dateTime))
+            if (!ExistAt(currentDate, nextDate))
             {
                 return false;
             }
 
-            var currentTimeMinutes = dateTime.Hour * 60 + dateTime.Minute;
-
             switch (Type)
             {
                 case DeliveryType.Regular:
-                    var closesAtMinutes = GetElapsedMinutes(ClosesAt!);
-                    return currentTimeMinutes <= closesAtMinutes;
+                    return currentDate.AddMinutes(ClosesBeforeMinutes) <= nextDate;
 
                 case DeliveryType.Urgent:
+                    var nextTimeMinutes = nextDate.Hour * 60 + nextDate.Minute;
                     var fromMinutes = GetElapsedMinutes(From);
                     var toMinutes = GetElapsedMinutes(To);
-                    return currentTimeMinutes >= fromMinutes && currentTimeMinutes <= toMinutes;
+                    return nextTimeMinutes >= fromMinutes && nextTimeMinutes <= toMinutes;
 
                 default:
                     return false;
@@ -124,6 +126,15 @@ namespace DeliveryTimeApi.Models
             var minutes = int.Parse(array[1]);
 
             return hours * 60 + minutes;
+        }
+
+        private static int GetClosesMinutes(string time, int closesBeforeMinutes)
+        {
+            var array = time.Split(":");
+            var hours = int.Parse(array[0]);
+            var minutes = int.Parse(array[1]);
+
+            return hours * 60 + minutes - closesBeforeMinutes;
         }
     }
 

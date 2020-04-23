@@ -24,7 +24,7 @@ namespace DeliveryTimeApi.UnitTests
             var currentTime = new DateTime(2020, 4, 17, 8, 0,0);
             var expectedDto = CreateDeliveryTimeDto(DeliveryType.Regular, _expectedStart, _expectedFinish, true);
             var sut = new DeliveryTimeService(new DeliveryTimeInMemoryRepository());
-            await sut.Add(CreateRegularDeliveryTime("14:00", "18:00", "10:00"));
+            await sut.Add(CreateRegularDeliveryTime("14:00", "18:00", 0));
 
             // Act
             var result = await sut.Get(currentTime, 0);
@@ -40,7 +40,7 @@ namespace DeliveryTimeApi.UnitTests
             var currentTime = new DateTime(2020, 4, 17, 12, 0, 0);
             var expectedDto = CreateDeliveryTimeDto(DeliveryType.Regular, _expectedStart, _expectedFinish, false);
             var sut = new DeliveryTimeService(new DeliveryTimeInMemoryRepository());
-            await sut.Add(CreateRegularDeliveryTime("14:00", "18:00", "10:00"));
+            await sut.Add(CreateRegularDeliveryTime("14:00", "18:00", 840));
 
             // Act
             var result = await sut.Get(currentTime, 0);
@@ -112,7 +112,7 @@ namespace DeliveryTimeApi.UnitTests
             };
         }
 
-        private DeliveryTime CreateRegularDeliveryTime(string from, string to, string closedAt)
+        private DeliveryTime CreateRegularDeliveryTime(string from, string to, int closesBeforeMinutes)
         {
             return new DeliveryTime
             {
@@ -125,7 +125,7 @@ namespace DeliveryTimeApi.UnitTests
                 From = from,
                 To = to,
                 DaysOfWeek = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday",
-                ClosesAt = closedAt
+                ClosesBeforeMinutes = closesBeforeMinutes
             };
         }
     }
