@@ -59,7 +59,7 @@ namespace DeliveryTimeApi.Models
         [RegularExpression(TimeOfDayExpression)]
         public string To { get; set; } = default!;
 
-        [RegularExpression(TimeOfDayExpression)]
+        [RegularExpression(ZeroOrPositiveExpression)]
         public int ClosesBeforeMinutes { get; set; }
 
         public bool ExistAt(DateTime currentDate, DateTime nextDate)

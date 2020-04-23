@@ -1,4 +1,4 @@
-@currentDate = 2020-04-17T00:00:00+00:00
+@currentDate = 2020-04-17T00:00:00%2B00:00
 @horizon = 7
 
 GET http://localhost:32768/deliverytimes?currentdate={{currentDate}}&horizon={{horizon}} HTTP/1.1
@@ -23,5 +23,5 @@ content-type: application/json
     "to": "20:00",
     "start": {{start}},
     "finish": {{finish}},
-    "closesAt": "16:00"
+    "closesBeforeMinutes": 800
 }
